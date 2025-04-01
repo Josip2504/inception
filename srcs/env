@@ -4,4 +4,4 @@ environment:
   - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/db_password
   - WORDPRESS_ADMIN_USER=manager  # Must not contain "admin"
   - WORDPRESS_ADMIN_PASSWORD_FILE=/run/secrets/wp_admin_password
-  - DOMAIN_NAME=yourlogin.42.fr
+  - DOMAIN_NAME=jsamardz.42.fr
