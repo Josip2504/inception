@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      context: ./requirements/nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "443:443"
+    volumes:
+      - wordpress_volume:/var/www/wordpress
+    networks:
+      - inception_network
+    depends_on:
+      - wordpress
+    secrets:
+      - ssl_cert
+      - ssl_key
+
+  wordpress:
+    build:
+      context: ./requirements/wordpress
+    container_name: wordpress
+    restart: always
+    volumes:
+      - wordpress_volume:/var/www/wordpress
+    networks:
+      - inception_network
+    environment:
+      - WORDPRESS_DB_HOST=mariadb
+      - WORDPRESS_DB_USER_FILE=/run/secrets/db_user
+      - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/db_password
+      - WORDPRESS_DB_NAME=wordpress
+    depends_on:
+      - mariadb
+    secrets:
+      - db_user
+      - db_password
+
+  mariadb:
+    build:
+      context: ./requirements/mariadb
+    container_name: mariadb
+    restart: always
+    volumes:
+      - database_volume:/var/lib/mysql
+    networks:
+      - inception_network
+    environment:
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER_FILE=/run/secrets/db_user
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+    secrets:
+      - db_user
+      - db_password
+      - db_root_password
+
+volumes:
+  wordpress_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${USER}/data/wordpress
+  database_volume:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${USER}/data/database
+
+networks:
+  inception_network:
+    driver: bridge
+
+secrets:
+  db_user:
+    file: ./secrets/db_user.txt
+  db_password:
+    file: ./secrets/db_password.txt
+  db_root_password:
+    file: ./secrets/db_root_password.txt
+  ssl_cert:
+    file: ./secrets/ssl_cert.pem
+  ssl_key:
+    file: ./secrets/ssl_key.pem
