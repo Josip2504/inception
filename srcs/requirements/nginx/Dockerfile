@@ -5,6 +5,10 @@ RUN apt-get update && apt-get install -y \
     openssl \
     && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /var/log/nginx /var/cache/nginx \
+    && chown -R www-data:www-data /var/log/nginx /var/cache/nginx \
+    && chmod -R 755 /var/log/nginx /var/cache/nginx
+
 COPY ./conf/nginx.conf /etc/nginx/nginx.conf
 COPY ./conf/ssl.conf /etc/nginx/conf.d/ssl.conf
 COPY ./tools/configure.sh /usr/local/bin/
