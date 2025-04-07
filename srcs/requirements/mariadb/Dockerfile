@@ -4,6 +4,8 @@ RUN apt-get update && apt-get install -y \
     mariadb-server \
     && rm -rf /var/lib/apt/lists/*
 
+RUN mkdir -p /var/run/mysqld && chown mysql:mysql /var/run/mysqld
+
 COPY ./conf/my.cnf /etc/mysql/my.cnf
 COPY ./tools/configure.sh /usr/local/bin/
 
